@@ -19,16 +19,10 @@ export interface VitaminDRecord {
   updatedAt: string; // ISO date string
 }
 
-export interface User {
-  username: string;
-  passwordHash: string;
-}
-
 export interface Database {
   medications: Medication[];
   feedings: FeedingSession[];
   vitaminD: VitaminDRecord[];
-  users: User[];
 }
 
 declare module "express-session" {

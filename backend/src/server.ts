@@ -14,11 +14,33 @@ import session from "express-session";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import crypto from "crypto";
+import dotenv from "dotenv";
 
-const app = express();
-const PORT = 3001;
+// Initialize __dirname (must come before dotenv.config)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, "../../.env") });
+
+// Validate environment variables
+function validateEnv() {
+  const required = ["ADMIN_USERNAME", "ADMIN_PASSWORD", "SESSION_SECRET"];
+
+  const missing = required.filter((key) => !process.env[key]);
+
+  if (missing.length > 0) {
+    console.error("Error: Missing required environment variables:");
+    missing.forEach((key) => console.error(`- ${key}`));
+    console.error("\nPlease check your .env file and try again.");
+    process.exit(1);
+  }
+}
+
+validateEnv();
+
+const app = express();
+const PORT = process.env.PORT || 3001;
 const DATA_FILE = path.join(__dirname, "../data/db.json");
 const FRONTEND_DIR = path.join(__dirname, "../../build");
 
@@ -35,7 +57,7 @@ app.use(
 app.use(express.json());
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: process.env.SESSION_SECRET || "fallback_secret_key",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -47,20 +69,11 @@ app.use(
   })
 );
 
-// Initialize database
+// Initialize database without users
 let db: Database = {
   medications: [],
   feedings: [],
   vitaminD: [],
-  users: [
-    // Add initial user - you should change this password!
-    {
-      username: "admin",
-      // This is a simple hash of "password" - you should use a better hashing method in production
-      passwordHash:
-        "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
-    },
-  ],
 };
 
 // Add these to track deletions
@@ -79,16 +92,11 @@ const requireAuth = (
   next();
 };
 
-// Load data on startup
+// Load data on startup - remove user preservation
 async function loadData() {
   try {
     const data = await fs.readFile(DATA_FILE, "utf-8");
-    const loadedDb = JSON.parse(data);
-    // Preserve default user if none exists in the file
-    if (!loadedDb.users || loadedDb.users.length === 0) {
-      loadedDb.users = db.users;
-    }
-    db = loadedDb;
+    db = JSON.parse(data);
   } catch (error) {
     console.log("No existing database found, starting fresh");
   }
@@ -107,9 +115,11 @@ async function saveData() {
 // Auth Routes
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
-  const user = db.users.find((u) => u.username === username);
 
-  if (user && hashPassword(password) === user.passwordHash) {
+  if (
+    username === process.env.ADMIN_USERNAME &&
+    hashPassword(password) === hashPassword(process.env.ADMIN_PASSWORD!)
+  ) {
     req.session.authenticated = true;
     res.json({ success: true });
   } else {
