@@ -1,0 +1,304 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.tracker-section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #0056b3;
+}
+
+.button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.vitamin-history {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.vitamin-day {
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+}
+
+.vitamin-day.taken {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.vitamin-day.not-taken {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.vitamin-day .date {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.breast-selection {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.button.selected {
+  background: #28a745;
+}
+
+.feeding-form {
+  margin-bottom: 20px;
+}
+
+.note-input {
+  margin-bottom: 15px;
+}
+
+.note-input input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.feeding-history {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.feeding-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f8f9fa;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.feeding-info {
+  flex: 1;
+}
+
+.feeding-time {
+  font-weight: bold;
+}
+
+.feeding-breast {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.feeding-note {
+  color: #666;
+  font-style: italic;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.button.small {
+  padding: 4px 8px;
+  font-size: 0.9em;
+}
+
+.medication-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.medication-info {
+  flex: 1;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.datetime-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.datetime-picker input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.button.secondary {
+  background: #6c757d;
+}
+
+.button.secondary:hover {
+  background: #5a6268;
+}
+
+.button.danger {
+  background: #dc3545;
+}
+
+.button.danger:hover {
+  background: #c82333;
+}
+
+.confirm-modal p {
+  margin-bottom: 20px;
+}
+
+.feeding-session-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor-section h4 {
+  margin: 0;
+  color: #666;
+}
+
+.editor-section .breast-selection {
+  margin: 0;
+}
+
+.editor-section .note-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.medication-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.medication-table th,
+.medication-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.medication-table th {
+  font-weight: 600;
+  color: #666;
+  background: #f8f9fa;
+}
+
+.medication-table tr:hover {
+  background: #f8f9fa;
+}
+
+.history-cell {
+  min-width: 250px;
+}
+
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.history-entry:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+.history-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.history-entry .button.small {
+  padding: 2px 6px;
+  font-size: 0.8em;
+}
+
+.history-time {
+  font-size: 0.9em;
+  color: #666;
+} 
