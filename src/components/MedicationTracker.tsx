@@ -11,9 +11,7 @@ const MEDICATION_RULES: MedicationRule[] = [
 ];
 
 const MedicationTracker: React.FC = () => {
-  const [medications, setMedications] = useState<Medication[]>(() =>
-    storage.getMedications()
-  );
+  const [medications, setMedications] = useState<Medication[]>([]);
   const [editingMedication, setEditingMedication] = useState<Medication | null>(
     null
   );
@@ -21,13 +19,18 @@ const MedicationTracker: React.FC = () => {
     useState<Medication | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  useEffect(() => {
+    const unsubscribe = storage.subscribeMedications(setMedications);
+    return () => unsubscribe();
+  }, []);
+
   // Update current time every minute
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  const addMedication = (
+  const addMedication = async (
     medicationName: string,
     timestamp: Date = new Date()
   ) => {
@@ -36,9 +39,17 @@ const MedicationTracker: React.FC = () => {
       name: medicationName,
       timestamp,
     };
-    const updatedMedications = [...medications, newMedication];
-    setMedications(updatedMedications);
-    storage.setMedications(updatedMedications);
+
+    // Optimistic update
+    setMedications((prev) => [...prev, newMedication]);
+
+    try {
+      await storage.addMedication(newMedication);
+    } catch (error) {
+      // Revert on error
+      setMedications((prev) => prev.filter((m) => m.id !== newMedication.id));
+      console.error("Failed to save medication:", error);
+    }
   };
 
   const getNextAllowedTime = (medicationName: string): Date | null => {
@@ -49,7 +60,7 @@ const MedicationTracker: React.FC = () => {
       .filter((m) => m.name === medicationName)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
 
-    if (!lastDose) return new Date();
+    if (!lastDose) return null;
 
     return new Date(
       lastDose.timestamp.getTime() + rule.hoursBetweenDoses * 60 * 60 * 1000
@@ -72,27 +83,53 @@ const MedicationTracker: React.FC = () => {
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   };
 
-  const updateMedicationTime = (newTimestamp: Date) => {
+  const updateMedicationTime = async (newTimestamp: Date) => {
     if (!editingMedication) return;
 
-    const updatedMedications = medications.map((med) =>
-      med.id === editingMedication.id
-        ? { ...med, timestamp: newTimestamp }
-        : med
+    const updatedMedication = {
+      ...editingMedication,
+      timestamp: newTimestamp,
+    };
+
+    // Optimistic update
+    setMedications((prev) =>
+      prev.map((med) =>
+        med.id === updatedMedication.id ? updatedMedication : med
+      )
     );
-    setMedications(updatedMedications);
-    storage.setMedications(updatedMedications);
+
+    try {
+      await storage.updateMedication(updatedMedication);
+    } catch (error) {
+      // Revert on error
+      setMedications((prev) =>
+        prev.map((med) =>
+          med.id === updatedMedication.id ? editingMedication : med
+        )
+      );
+      console.error("Failed to update medication:", error);
+    }
     setEditingMedication(null);
   };
 
-  const deleteMedication = () => {
+  const deleteMedication = async () => {
     if (!deletingMedication) return;
 
-    const updatedMedications = medications.filter(
-      (med) => med.id !== deletingMedication.id
+    // Store for potential revert
+    const medicationToDelete = deletingMedication;
+
+    // Optimistic update
+    setMedications((prev) =>
+      prev.filter((m) => m.id !== medicationToDelete.id)
     );
-    setMedications(updatedMedications);
-    storage.setMedications(updatedMedications);
+
+    try {
+      await storage.deleteMedication(medicationToDelete.id);
+    } catch (error) {
+      // Revert on error
+      setMedications((prev) => [...prev, medicationToDelete]);
+      console.error("Failed to delete medication:", error);
+    }
     setDeletingMedication(null);
   };
 
@@ -155,7 +192,7 @@ const MedicationTracker: React.FC = () => {
                   </button>
                 </td>
                 <td>
-                  {nextAllowed && !canTake
+                  {nextAllowed
                     ? nextAllowed.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -163,11 +200,7 @@ const MedicationTracker: React.FC = () => {
                       })
                     : "Now"}
                 </td>
-                <td>
-                  {nextAllowed && !canTake
-                    ? formatTimeRemaining(nextAllowed)
-                    : "-"}
-                </td>
+                <td>{nextAllowed ? formatTimeRemaining(nextAllowed) : "-"}</td>
                 <td className="history-cell">
                   {history.map((med) => (
                     <div key={med.id} className="history-entry">

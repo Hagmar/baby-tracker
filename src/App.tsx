@@ -2,13 +2,26 @@ import React from "react";
 import MedicationTracker from "./components/MedicationTracker";
 import VitaminDTracker from "./components/VitaminDTracker";
 import BreastfeedingTracker from "./components/BreastfeedingTracker";
+import LoginPage from "./components/LoginPage";
+import { useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
 function App() {
+  const { isAuthenticated, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
   return (
     <div className="app">
       <header>
-        <h1>Baby Tracker</h1>
+        <div className="header-content">
+          <h1>Baby Tracker</h1>
+          <button className="button secondary" onClick={logout}>
+            Logout
+          </button>
+        </div>
       </header>
       <main>
         <section className="tracker-section">

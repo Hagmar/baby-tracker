@@ -1,0 +1,258 @@
+import express from "express";
+import cors from "cors";
+import {
+  Database,
+  Medication,
+  FeedingSession,
+  VitaminDRecord,
+  SyncRequest,
+  SyncResponse,
+} from "./types";
+import fs from "fs/promises";
+import path from "path";
+import session from "express-session";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import crypto from "crypto";
+
+const app = express();
+const PORT = 3001;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const DATA_FILE = path.join(__dirname, "../data/db.json");
+const FRONTEND_DIR = path.join(__dirname, "../../build");
+
+// Move static file serving before other middleware
+app.use(express.static(FRONTEND_DIR));
+
+// Middleware
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(
+  session({
+    secret: "your-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+    },
+    name: "baby-tracker-session",
+  })
+);
+
+// Initialize database
+let db: Database = {
+  medications: [],
+  feedings: [],
+  vitaminD: [],
+  users: [
+    // Add initial user - you should change this password!
+    {
+      username: "admin",
+      // This is a simple hash of "password" - you should use a better hashing method in production
+      passwordHash:
+        "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    },
+  ],
+};
+
+// Add these to track deletions
+let deletedFeedings: { id: string; deletedAt: string }[] = [];
+
+// Authentication middleware
+const requireAuth = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  if (!req.session.authenticated) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  next();
+};
+
+// Load data on startup
+async function loadData() {
+  try {
+    const data = await fs.readFile(DATA_FILE, "utf-8");
+    const loadedDb = JSON.parse(data);
+    // Preserve default user if none exists in the file
+    if (!loadedDb.users || loadedDb.users.length === 0) {
+      loadedDb.users = db.users;
+    }
+    db = loadedDb;
+  } catch (error) {
+    console.log("No existing database found, starting fresh");
+  }
+}
+
+// Save data to file
+async function saveData() {
+  try {
+    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
+    await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+}
+
+// Auth Routes
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+  const user = db.users.find((u) => u.username === username);
+
+  if (user && hashPassword(password) === user.passwordHash) {
+    req.session.authenticated = true;
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ error: "Invalid credentials" });
+  }
+});
+
+app.post("/api/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ error: "Logout failed" });
+    } else {
+      res.json({ success: true });
+    }
+  });
+});
+
+app.get("/api/check-session", (req, res) => {
+  if (req.session.authenticated) {
+    res.json({ authenticated: true });
+  } else {
+    res.status(401).json({ authenticated: false });
+  }
+});
+
+// API Routes - now with authentication
+app.get("/api/medications", requireAuth, (req, res) => {
+  res.json(db.medications);
+});
+
+app.post("/api/medications", requireAuth, (req, res) => {
+  const medication = req.body;
+  db.medications.push(medication);
+  saveData();
+  res.json(medication);
+});
+
+app.put("/api/medications/:id", requireAuth, (req, res) => {
+  const { id } = req.params;
+  const medication = req.body;
+
+  const index = db.medications.findIndex((m) => m.id === id);
+  if (index === -1) {
+    res.status(404).json({ error: "Medication not found" });
+    return;
+  }
+
+  db.medications[index] = medication;
+  saveData();
+  res.json(medication);
+});
+
+app.delete("/api/medications/:id", requireAuth, (req, res) => {
+  const { id } = req.params;
+  db.medications = db.medications.filter((m) => m.id !== id);
+  saveData();
+  res.json({ success: true });
+});
+
+app.get("/api/feedings", requireAuth, (req, res) => {
+  res.json(db.feedings);
+});
+
+app.post("/api/feedings", requireAuth, (req, res) => {
+  const feeding = req.body;
+  db.feedings.push(feeding);
+  saveData();
+  res.json(feeding);
+});
+
+app.put("/api/feedings/:id", requireAuth, (req, res) => {
+  const { id } = req.params;
+  const feeding = req.body;
+
+  const index = db.feedings.findIndex((f) => f.id === id);
+  if (index === -1) {
+    res.status(404).json({ error: "Feeding session not found" });
+    return;
+  }
+
+  db.feedings[index] = feeding;
+  saveData();
+  res.json(feeding);
+});
+
+app.delete("/api/feedings/:id", requireAuth, (req, res) => {
+  const { id } = req.params;
+  db.feedings = db.feedings.filter((f) => f.id !== id);
+  saveData();
+  res.json({ success: true });
+});
+
+app.get("/api/vitamin-d", requireAuth, (req, res) => {
+  res.json(db.vitaminD);
+});
+
+app.post("/api/vitamin-d", requireAuth, (req, res) => {
+  const record = req.body;
+  const index = db.vitaminD.findIndex((r) => r.date === record.date);
+  if (index >= 0) {
+    db.vitaminD[index] = record;
+  } else {
+    db.vitaminD.push(record);
+  }
+  saveData();
+  res.json(record);
+});
+
+app.put("/api/vitamin-d/:date", requireAuth, (req, res) => {
+  const { date } = req.params;
+  const record = req.body;
+
+  const index = db.vitaminD.findIndex((r) => r.date === date);
+  if (index === -1) {
+    res.status(404).json({ error: "Vitamin D record not found" });
+    return;
+  }
+
+  db.vitaminD[index] = record;
+  saveData();
+  res.json(record);
+});
+
+app.delete("/api/vitamin-d/:date", requireAuth, (req, res) => {
+  const { date } = req.params;
+  db.vitaminD = db.vitaminD.filter((r) => r.date !== date);
+  saveData();
+  res.json({ success: true });
+});
+
+// Catch-all route for client-side routing - must be last
+app.get("*", (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, "index.html"));
+});
+
+// Update the hashPassword function to use the imported crypto
+function hashPassword(password: string): string {
+  return crypto.createHash("sha256").update(password).digest("hex");
+}
+
+// Start server
+loadData().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+});

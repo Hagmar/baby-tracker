@@ -3,30 +3,53 @@ import { VitaminDRecord } from "../types";
 import { storage } from "../utils/storage";
 
 const VitaminDTracker: React.FC = () => {
-  const [records, setRecords] = useState<VitaminDRecord[]>(() =>
-    storage.getVitaminD()
-  );
+  const [records, setRecords] = useState<VitaminDRecord[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = storage.subscribeVitaminD(setRecords);
+    return () => unsubscribe();
+  }, []);
 
   const getToday = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
 
-  const markTaken = () => {
+  const markTaken = async () => {
     const today = getToday();
     const existingRecord = records.find((r) => r.date === today);
 
-    let updatedRecords: VitaminDRecord[];
-    if (existingRecord) {
-      updatedRecords = records.map((r) =>
-        r.date === today ? { ...r, taken: true } : r
-      );
-    } else {
-      updatedRecords = [...records, { date: today, taken: true }];
-    }
+    const newRecord = {
+      date: today,
+      taken: true,
+    };
 
-    setRecords(updatedRecords);
-    storage.setVitaminD(updatedRecords);
+    // Optimistic update
+    setRecords((prev) => {
+      if (existingRecord) {
+        return prev.map((r) => (r.date === today ? newRecord : r));
+      } else {
+        return [...prev, newRecord];
+      }
+    });
+
+    try {
+      if (existingRecord) {
+        await storage.updateVitaminD(newRecord);
+      } else {
+        await storage.addVitaminD(newRecord);
+      }
+    } catch (error) {
+      // Revert on error
+      setRecords((prev) => {
+        if (existingRecord) {
+          return prev.map((r) => (r.date === today ? existingRecord : r));
+        } else {
+          return prev.filter((r) => r.date !== today);
+        }
+      });
+      console.error("Failed to update vitamin D record:", error);
+    }
   };
 
   const getLast3Days = () => {

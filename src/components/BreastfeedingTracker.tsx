@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FeedingSession } from "../types";
 import { storage } from "../utils/storage";
 import Modal from "./Modal";
@@ -7,9 +7,7 @@ import ConfirmModal from "./ConfirmModal";
 import FeedingSessionEditor from "./FeedingSessionEditor";
 
 const BreastfeedingTracker: React.FC = () => {
-  const [sessions, setSessions] = useState<FeedingSession[]>(() =>
-    storage.getFeedings()
-  );
+  const [sessions, setSessions] = useState<FeedingSession[]>([]);
   const [note, setNote] = useState("");
   const [selectedBreast, setSelectedBreast] = useState<
     "left" | "right" | "both" | null
@@ -21,7 +19,12 @@ const BreastfeedingTracker: React.FC = () => {
     null
   );
 
-  const addSession = (timestamp: Date = new Date()) => {
+  useEffect(() => {
+    const unsubscribe = storage.subscribeFeedings(setSessions);
+    return () => unsubscribe();
+  }, []);
+
+  const addSession = async (timestamp: Date = new Date()) => {
     const newSession: FeedingSession = {
       id: Date.now().toString(),
       timestamp,
@@ -29,21 +32,41 @@ const BreastfeedingTracker: React.FC = () => {
       note: note.trim() || undefined,
     };
 
-    const updatedSessions = [...sessions, newSession];
-    setSessions(updatedSessions);
-    storage.setFeedings(updatedSessions);
+    // Optimistic update
+    setSessions((prev) => [...prev, newSession]);
+
+    try {
+      await storage.addFeeding(newSession);
+    } catch (error) {
+      // Revert on error
+      setSessions((prev) => prev.filter((s) => s.id !== newSession.id));
+      console.error("Failed to save feeding session:", error);
+    }
 
     // Reset form
     setNote("");
     setSelectedBreast(null);
   };
 
-  const updateSession = (updatedSession: FeedingSession) => {
-    const updatedSessions = sessions.map((session) =>
-      session.id === updatedSession.id ? updatedSession : session
+  const updateSession = async (updatedSession: FeedingSession) => {
+    // Optimistic update
+    setSessions((prev) =>
+      prev.map((session) =>
+        session.id === updatedSession.id ? updatedSession : session
+      )
     );
-    setSessions(updatedSessions);
-    storage.setFeedings(updatedSessions);
+
+    try {
+      await storage.updateFeeding(updatedSession);
+    } catch (error) {
+      // Revert on error
+      setSessions((prev) =>
+        prev.map((session) =>
+          session.id === updatedSession.id ? editingSession! : session
+        )
+      );
+      console.error("Failed to update feeding session:", error);
+    }
     setEditingSession(null);
   };
 
@@ -55,14 +78,22 @@ const BreastfeedingTracker: React.FC = () => {
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   };
 
-  const deleteSession = () => {
+  const deleteSession = async () => {
     if (!deletingSession) return;
 
-    const updatedSessions = sessions.filter(
-      (session) => session.id !== deletingSession.id
-    );
-    setSessions(updatedSessions);
-    storage.setFeedings(updatedSessions);
+    // Store for potential revert
+    const sessionToDelete = deletingSession;
+
+    // Optimistic update
+    setSessions((prev) => prev.filter((s) => s.id !== sessionToDelete.id));
+
+    try {
+      await storage.deleteFeeding(sessionToDelete.id);
+    } catch (error) {
+      // Revert on error
+      setSessions((prev) => [...prev, sessionToDelete]);
+      console.error("Failed to delete feeding session:", error);
+    }
     setDeletingSession(null);
   };
 
