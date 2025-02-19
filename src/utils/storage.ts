@@ -8,11 +8,18 @@ const LOCAL_STORAGE_KEYS = {
   FEEDINGS: "baby_tracker_feedings",
 };
 
+// Add a base URL helper
+const getApiUrl = (path: string) => {
+  // Remove leading slash if present
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  return `api/${cleanPath}`;
+};
+
 export const storage = {
   // Medications
   subscribeMedications: (callback: StorageCallback<Medication>) => {
     const fetchData = async () => {
-      const response = await fetch("/api/medications", {
+      const response = await fetch(getApiUrl("medications"), {
         credentials: "include",
       });
       const data = await response.json();
@@ -30,7 +37,7 @@ export const storage = {
   },
 
   addMedication: async (medication: Medication) => {
-    const response = await fetch("/api/medications", {
+    const response = await fetch(getApiUrl("medications"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -45,7 +52,7 @@ export const storage = {
   },
 
   updateMedication: async (medication: Medication) => {
-    const response = await fetch(`/api/medications/${medication.id}`, {
+    const response = await fetch(getApiUrl(`medications/${medication.id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -60,7 +67,7 @@ export const storage = {
   },
 
   deleteMedication: async (id: string) => {
-    const response = await fetch(`/api/medications/${id}`, {
+    const response = await fetch(getApiUrl(`medications/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
@@ -72,7 +79,7 @@ export const storage = {
   // Feedings
   subscribeFeedings: (callback: StorageCallback<FeedingSession>) => {
     const fetchData = async () => {
-      const response = await fetch("/api/feedings", {
+      const response = await fetch(getApiUrl("feedings"), {
         credentials: "include",
       });
       const data = await response.json();
@@ -90,7 +97,7 @@ export const storage = {
   },
 
   addFeeding: async (feeding: FeedingSession) => {
-    const response = await fetch("/api/feedings", {
+    const response = await fetch(getApiUrl("feedings"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -105,7 +112,7 @@ export const storage = {
   },
 
   updateFeeding: async (feeding: FeedingSession) => {
-    const response = await fetch(`/api/feedings/${feeding.id}`, {
+    const response = await fetch(getApiUrl(`feedings/${feeding.id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -120,7 +127,7 @@ export const storage = {
   },
 
   deleteFeeding: async (id: string) => {
-    const response = await fetch(`/api/feedings/${id}`, {
+    const response = await fetch(getApiUrl(`feedings/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
@@ -132,7 +139,7 @@ export const storage = {
   // Vitamin D
   subscribeVitaminD: (callback: StorageCallback<VitaminDRecord>) => {
     const fetchData = async () => {
-      const response = await fetch("/api/vitamin-d", {
+      const response = await fetch(getApiUrl("vitamin-d"), {
         credentials: "include",
       });
       const data = await response.json();
@@ -145,7 +152,7 @@ export const storage = {
   },
 
   addVitaminD: async (record: VitaminDRecord) => {
-    const response = await fetch("/api/vitamin-d", {
+    const response = await fetch(getApiUrl("vitamin-d"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(record),
@@ -157,7 +164,7 @@ export const storage = {
   },
 
   updateVitaminD: async (record: VitaminDRecord) => {
-    const response = await fetch(`/api/vitamin-d/${record.date}`, {
+    const response = await fetch(getApiUrl(`vitamin-d/${record.date}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(record),
@@ -169,7 +176,7 @@ export const storage = {
   },
 
   deleteVitaminD: async (date: string) => {
-    const response = await fetch(`/api/vitamin-d/${date}`, {
+    const response = await fetch(getApiUrl(`vitamin-d/${date}`), {
       method: "DELETE",
       credentials: "include",
     });
