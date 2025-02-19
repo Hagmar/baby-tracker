@@ -8,8 +8,8 @@ const LOCAL_STORAGE_KEYS = {
   FEEDINGS: "baby_tracker_feedings",
 };
 
-// Add a base URL helper
-const getApiUrl = (path: string) => {
+// Make the helper available for other components
+export const getApiUrl = (path: string) => {
   // Remove leading slash if present
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   return `api/${cleanPath}`;

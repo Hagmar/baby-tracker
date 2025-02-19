@@ -1,74 +1,53 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { getApiUrl } from "../utils/storage";
 
-interface AuthContextType {
+export const AuthContext = createContext<{
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
+}>({
+  isAuthenticated: false,
+  login: async () => {},
+  logout: async () => {},
+});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Check session status on mount
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch("/api/check-session", {
-          credentials: "include",
-        });
-        if (response.ok) {
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error("Session check error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
+    // Check session on mount
+    fetch(getApiUrl("check-session"), {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => setIsAuthenticated(data.authenticated))
+      .catch(() => setIsAuthenticated(false));
   }, []);
 
   const login = async (username: string, password: string) => {
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-        credentials: "include",
-      });
+    const response = await fetch(getApiUrl("login"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+      credentials: "include",
+    });
 
-      if (response.ok) {
-        setIsAuthenticated(true);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Login error:", error);
-      return false;
+    if (!response.ok) {
+      throw new Error("Login failed");
     }
+
+    setIsAuthenticated(true);
   };
 
   const logout = async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await fetch(getApiUrl("logout"), {
+      method: "POST",
+      credentials: "include",
+    });
+    setIsAuthenticated(false);
   };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
@@ -77,10 +56,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
