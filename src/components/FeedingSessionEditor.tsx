@@ -13,35 +13,19 @@ const FeedingSessionEditor: React.FC<FeedingSessionEditorProps> = ({
   onSave,
   onCancel,
 }) => {
-  const [editedSession, setEditedSession] = useState<FeedingSession>({
-    ...session,
-  });
-
-  const handleTimeChange = (newTimestamp: Date) => {
-    setEditedSession((prev) => ({
-      ...prev,
-      timestamp: newTimestamp,
-    }));
-  };
-
-  const handleBreastChange = (
-    newBreast: "left" | "right" | "both" | undefined
-  ) => {
-    setEditedSession((prev) => ({
-      ...prev,
-      breast: newBreast,
-    }));
-  };
-
-  const handleNoteChange = (newNote: string) => {
-    setEditedSession((prev) => ({
-      ...prev,
-      note: newNote.trim() || undefined,
-    }));
-  };
+  const [timestamp, setTimestamp] = useState(new Date(session.timestamp));
+  const [breast, setBreast] = useState<"left" | "right" | "both" | undefined>(
+    session.breast
+  );
+  const [note, setNote] = useState(session.note || "");
 
   const handleSave = () => {
-    onSave(editedSession);
+    onSave({
+      ...session,
+      timestamp,
+      breast,
+      note: note.trim() || undefined,
+    });
   };
 
   return (
@@ -49,8 +33,8 @@ const FeedingSessionEditor: React.FC<FeedingSessionEditorProps> = ({
       <div className="editor-section">
         <h4>Time</h4>
         <DateTimePicker
-          initialDate={editedSession.timestamp}
-          onSave={handleTimeChange}
+          initialDate={timestamp}
+          onSave={setTimestamp}
           onCancel={() => {}}
           hideButtons
         />
@@ -60,38 +44,23 @@ const FeedingSessionEditor: React.FC<FeedingSessionEditorProps> = ({
         <h4>Breast</h4>
         <div className="breast-selection">
           <button
-            className={`button ${
-              editedSession.breast === "left" ? "selected" : ""
-            }`}
-            onClick={() =>
-              handleBreastChange(
-                editedSession.breast === "left" ? undefined : "left"
-              )
-            }
+            className={`button ${breast === "left" ? "selected" : ""}`}
+            onClick={() => setBreast("left")}
+            type="button"
           >
             Left
           </button>
           <button
-            className={`button ${
-              editedSession.breast === "right" ? "selected" : ""
-            }`}
-            onClick={() =>
-              handleBreastChange(
-                editedSession.breast === "right" ? undefined : "right"
-              )
-            }
+            className={`button ${breast === "right" ? "selected" : ""}`}
+            onClick={() => setBreast("right")}
+            type="button"
           >
             Right
           </button>
           <button
-            className={`button ${
-              editedSession.breast === "both" ? "selected" : ""
-            }`}
-            onClick={() =>
-              handleBreastChange(
-                editedSession.breast === "both" ? undefined : "both"
-              )
-            }
+            className={`button ${breast === "both" ? "selected" : ""}`}
+            onClick={() => setBreast("both")}
+            type="button"
           >
             Both
           </button>
@@ -102,8 +71,8 @@ const FeedingSessionEditor: React.FC<FeedingSessionEditorProps> = ({
         <h4>Note</h4>
         <input
           type="text"
-          value={editedSession.note || ""}
-          onChange={(e) => handleNoteChange(e.target.value)}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
           placeholder="Add a note (optional)"
           className="note-input"
         />
