@@ -233,4 +233,23 @@ body {
   .vitamin-day {
     margin-bottom: 0.5rem;
   }
+}
+
+/* Note textarea in feeding editor */
+.feeding-session-editor .note-input {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  resize: vertical;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+.feeding-session-editor .note-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 } 

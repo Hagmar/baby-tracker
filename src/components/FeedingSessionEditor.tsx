@@ -69,12 +69,12 @@ const FeedingSessionEditor: React.FC<FeedingSessionEditorProps> = ({
 
       <div className="editor-section">
         <h4>Note</h4>
-        <input
-          type="text"
+        <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Add a note (optional)"
           className="note-input"
+          rows={4}
         />
       </div>
 
