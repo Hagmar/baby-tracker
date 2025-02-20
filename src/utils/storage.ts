@@ -12,7 +12,14 @@ const LOCAL_STORAGE_KEYS = {
 export const getApiUrl = (path: string) => {
   // Remove leading slash if present
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-  return `api/${cleanPath}`;
+
+  if (process.env.NODE_ENV === "development") {
+    // In development, use absolute path for proxy to work
+    return `/api/${cleanPath}`;
+  } else {
+    // In production, use relative path
+    return `api/${cleanPath}`;
+  }
 };
 
 export const storage = {
