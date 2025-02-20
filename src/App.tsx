@@ -25,8 +25,8 @@ function App() {
       </header>
       <main>
         <section className="tracker-section">
-          <h2>Mom's Medication</h2>
-          <MedicationTracker />
+          <h2>Breastfeeding</h2>
+          <BreastfeedingTracker />
         </section>
 
         <section className="tracker-section">
@@ -35,8 +35,8 @@ function App() {
         </section>
 
         <section className="tracker-section">
-          <h2>Breastfeeding</h2>
-          <BreastfeedingTracker />
+          <h2>Mom's Medication</h2>
+          <MedicationTracker />
         </section>
       </main>
     </div>
