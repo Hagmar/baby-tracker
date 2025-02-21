@@ -69,11 +69,13 @@ app.use(
   })
 );
 
-// Initialize database without users
+// Initialize database
 let db: Database = {
   medications: [],
   feedings: [],
   vitaminD: [],
+  baths: [],
+  bellyButton: [],
 };
 
 // Add these to track deletions
@@ -248,6 +250,50 @@ app.delete("/api/vitamin-d/:date", requireAuth, (req, res) => {
   db.vitaminD = db.vitaminD.filter((r) => r.date !== date);
   saveData();
   res.json({ success: true });
+});
+
+// Bath routes
+app.get("/api/baths", requireAuth, (req, res) => {
+  res.json(db.baths ?? []);
+});
+
+app.post("/api/baths", requireAuth, (req, res) => {
+  const bath = req.body;
+  db.baths.push(bath);
+  saveData();
+  res.json(bath);
+});
+
+// Belly button routes
+app.get("/api/belly-button", requireAuth, (req, res) => {
+  res.json(db.bellyButton ?? []);
+});
+
+app.post("/api/belly-button", requireAuth, (req, res) => {
+  const record = req.body;
+  const index = db.bellyButton.findIndex((r) => r.date === record.date);
+  if (index >= 0) {
+    db.bellyButton[index] = record;
+  } else {
+    db.bellyButton.push(record);
+  }
+  saveData();
+  res.json(record);
+});
+
+app.put("/api/belly-button/:date", requireAuth, (req, res) => {
+  const { date } = req.params;
+  const record = req.body;
+
+  const index = db.bellyButton.findIndex((r) => r.date === date);
+  if (index === -1) {
+    res.status(404).json({ error: "Belly button record not found" });
+    return;
+  }
+
+  db.bellyButton[index] = record;
+  saveData();
+  res.json(record);
 });
 
 // Catch-all route for client-side routing - must be last

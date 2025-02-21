@@ -23,6 +23,8 @@ export interface Database {
   medications: Medication[];
   feedings: FeedingSession[];
   vitaminD: VitaminDRecord[];
+  baths: BathRecord[];
+  bellyButton: BellyButtonRecord[];
 }
 
 declare module "express-session" {
@@ -40,4 +42,18 @@ export interface SyncResponse<T> {
   updates: T[];
   deletions: string[]; // Array of IDs that were deleted
   timestamp: string; // Current server timestamp
+}
+
+// Add these interfaces too
+export interface BathRecord {
+  id: string;
+  timestamp: string;
+  updatedAt: string;
+}
+
+export interface BellyButtonRecord {
+  date: string;
+  morning: boolean;
+  evening: boolean;
+  updatedAt: string;
 }

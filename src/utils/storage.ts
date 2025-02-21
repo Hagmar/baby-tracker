@@ -1,4 +1,10 @@
-import { Medication, FeedingSession, VitaminDRecord } from "../types";
+import {
+  Medication,
+  FeedingSession,
+  VitaminDRecord,
+  BathRecord,
+  BellyButtonRecord,
+} from "../types";
 
 type StorageCallback<T> = (data: T[]) => void;
 
@@ -189,6 +195,72 @@ export const storage = {
     });
 
     if (!response.ok) throw new Error("Failed to delete vitamin D record");
+    return response.json();
+  },
+
+  // Bath tracking
+  subscribeBaths: (callback: StorageCallback<BathRecord>) => {
+    const fetchData = async () => {
+      const response = await fetch(getApiUrl("baths"), {
+        credentials: "include",
+      });
+      const data = await response.json();
+      callback(data);
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  },
+
+  addBath: async (bath: BathRecord) => {
+    const response = await fetch(getApiUrl("baths"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bath),
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to save bath record");
+    return response.json();
+  },
+
+  // Belly button tracking
+  subscribeBellyButton: (callback: StorageCallback<BellyButtonRecord>) => {
+    const fetchData = async () => {
+      const response = await fetch(getApiUrl("belly-button"), {
+        credentials: "include",
+      });
+      const data = await response.json();
+      callback(data);
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  },
+
+  addBellyButton: async (record: BellyButtonRecord) => {
+    const response = await fetch(getApiUrl("belly-button"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to save belly button record");
+    return response.json();
+  },
+
+  updateBellyButton: async (record: BellyButtonRecord) => {
+    const response = await fetch(getApiUrl(`belly-button/${record.date}`), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to update belly button record");
     return response.json();
   },
 };
