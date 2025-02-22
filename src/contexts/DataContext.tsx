@@ -33,10 +33,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateData = async () => {
     try {
-      const response = await fetch(storage.getApiUrl("status"), {
-        credentials: "include",
-      });
-      const newData = await response.json();
+      const newData = await storage.getStatus();
 
       // Convert dates for feedings and medications
       const processedData = {

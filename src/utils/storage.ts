@@ -29,11 +29,11 @@ export const getApiUrl = (path: string) => {
 };
 
 export const storage = {
-  getApiUrl: (path: string) => {
-    const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-    return process.env.NODE_ENV === "development"
-      ? `/api/${cleanPath}`
-      : `api/${cleanPath}`;
+  getStatus: async () => {
+    const response = await fetch(getApiUrl("status"), {
+      credentials: "include",
+    });
+    return response.json();
   },
 
   // Medications
