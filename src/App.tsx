@@ -7,9 +7,36 @@ import BellyButtonTracker from "./components/BellyButtonTracker";
 import LoginPage from "./components/LoginPage";
 import { useAuth } from "./contexts/AuthContext";
 import "./App.css";
+import StatusPanel from "./components/StatusPanel";
+import { useState, useEffect } from "react";
+import { storage } from "./utils/storage";
+import {
+  FeedingSession,
+  VitaminDRecord,
+  BathRecord,
+  BellyButtonRecord,
+} from "./types";
 
 function App() {
   const { isAuthenticated, logout } = useAuth();
+  const [feedings, setFeedings] = useState<FeedingSession[]>([]);
+  const [vitaminD, setVitaminD] = useState<VitaminDRecord[]>([]);
+  const [baths, setBaths] = useState<BathRecord[]>([]);
+  const [bellyButton, setBellyButton] = useState<BellyButtonRecord[]>([]);
+
+  useEffect(() => {
+    const unsubscribeFeedings = storage.subscribeFeedings(setFeedings);
+    const unsubscribeVitaminD = storage.subscribeVitaminD(setVitaminD);
+    const unsubscribeBaths = storage.subscribeBaths(setBaths);
+    const unsubscribeBellyButton = storage.subscribeBellyButton(setBellyButton);
+
+    return () => {
+      unsubscribeFeedings();
+      unsubscribeVitaminD();
+      unsubscribeBaths();
+      unsubscribeBellyButton();
+    };
+  }, []);
 
   if (!isAuthenticated) {
     return <LoginPage />;
@@ -26,6 +53,12 @@ function App() {
         </div>
       </header>
       <main>
+        <StatusPanel
+          feedings={feedings}
+          vitaminD={vitaminD}
+          baths={baths}
+          bellyButton={bellyButton}
+        />
         <section className="tracker-section">
           <h2>Breastfeeding</h2>
           <BreastfeedingTracker />

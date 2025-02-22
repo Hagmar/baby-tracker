@@ -344,4 +344,55 @@ body {
 
 .next-feeding-estimate strong.past {
   color: var(--danger-color);
+}
+
+.status-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.status-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.status-indicator.future {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-indicator.soon {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.status-indicator.past,
+.status-indicator.danger {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-indicator.warning {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.status-indicator.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-label {
+  font-size: 0.75rem;
+  font-weight: 500;
 } 
