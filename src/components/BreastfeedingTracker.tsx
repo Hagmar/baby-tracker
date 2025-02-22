@@ -126,8 +126,39 @@ const BreastfeedingTracker: React.FC = () => {
     }
   };
 
+  const getNextFeedingEstimate = (feedings: FeedingSession[]): Date | null => {
+    if (feedings.length === 0) return null;
+
+    const latestFeeding = new Date(
+      Math.max(...feedings.map((f) => f.timestamp.getTime()))
+    );
+    return new Date(latestFeeding.getTime() + 3 * 60 * 60 * 1000); // Add 3 hours
+  };
+
+  const nextFeeding = getNextFeedingEstimate(sessions);
+
+  const getEstimateStatus = (
+    estimatedTime: Date
+  ): "future" | "soon" | "past" => {
+    const now = new Date();
+    const diffMs = estimatedTime.getTime() - now.getTime();
+    const hourMs = 60 * 60 * 1000;
+
+    if (diffMs < 0) return "past";
+    if (diffMs < hourMs) return "soon";
+    return "future";
+  };
+
   return (
     <div className="breastfeeding-tracker">
+      {nextFeeding && (
+        <div className="next-feeding-estimate">
+          <span>Next feeding estimated: </span>
+          <strong className={getEstimateStatus(nextFeeding)}>
+            {formatTimestamp(nextFeeding)}
+          </strong>
+        </div>
+      )}
       <div className="feeding-form">
         <div className="breast-selection">
           <button

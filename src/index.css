@@ -320,4 +320,28 @@ body {
   .cleaning-history {
     grid-template-columns: 1fr;
   }
+}
+
+.next-feeding-estimate {
+  padding: 1rem;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.next-feeding-estimate strong {
+  color: var(--primary-color);
+}
+
+.next-feeding-estimate strong.future {
+  color: #4caf50;
+}
+
+.next-feeding-estimate strong.soon {
+  color: #ff9800;
+}
+
+.next-feeding-estimate strong.past {
+  color: var(--danger-color);
 } 
