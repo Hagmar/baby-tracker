@@ -166,37 +166,39 @@ const BreastfeedingTracker: React.FC = () => {
         </button>
       </div>
 
-      <div className="feeding-history">
+      <div className="feeding-section">
         <h3>Last 24 Hours</h3>
-        {getLast24Hours().map((session) => (
-          <div key={session.id} className="feeding-entry">
-            <div className="feeding-info">
-              <div className="feeding-time">
-                {formatTimestamp(session.timestamp)}
+        <div className="feeding-history">
+          {getLast24Hours().map((session) => (
+            <div key={session.id} className="feeding-entry">
+              <div className="feeding-info">
+                <div className="feeding-time">
+                  {formatTimestamp(session.timestamp)}
+                </div>
+                {session.breast && (
+                  <div className="feeding-breast">Breast: {session.breast}</div>
+                )}
+                {session.note && (
+                  <div className="feeding-note">{session.note}</div>
+                )}
               </div>
-              {session.breast && (
-                <div className="feeding-breast">Breast: {session.breast}</div>
-              )}
-              {session.note && (
-                <div className="feeding-note">{session.note}</div>
-              )}
+              <div className="entry-actions">
+                <button
+                  className="button small"
+                  onClick={() => setEditingSession(session)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="button small danger"
+                  onClick={() => setDeletingSession(session)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            <div className="entry-actions">
-              <button
-                className="button small"
-                onClick={() => setEditingSession(session)}
-              >
-                Edit
-              </button>
-              <button
-                className="button small danger"
-                onClick={() => setDeletingSession(session)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <Modal
