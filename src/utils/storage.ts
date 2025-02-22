@@ -29,6 +29,13 @@ export const getApiUrl = (path: string) => {
 };
 
 export const storage = {
+  getApiUrl: (path: string) => {
+    const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+    return process.env.NODE_ENV === "development"
+      ? `/api/${cleanPath}`
+      : `api/${cleanPath}`;
+  },
+
   // Medications
   subscribeMedications: (callback: StorageCallback<Medication>) => {
     const fetchData = async () => {

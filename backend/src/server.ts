@@ -113,7 +113,7 @@ async function loadData() {
     db = migrateDatabase(JSON.parse(data));
   } catch (error) {
     console.log("No existing database found, starting fresh");
-    db = migrateDatabase({});
+    // db = migrateDatabase({});
   }
 }
 
@@ -307,6 +307,17 @@ app.put("/api/belly-button/:date", requireAuth, (req, res) => {
   db.bellyButton[index] = record;
   saveData();
   res.json(record);
+});
+
+// Add this route before the catch-all route
+app.get("/api/status", requireAuth, (req, res) => {
+  res.json({
+    medications: db.medications,
+    feedings: db.feedings,
+    vitaminD: db.vitaminD,
+    baths: db.baths,
+    bellyButton: db.bellyButton,
+  });
 });
 
 // Catch-all route for client-side routing - must be last

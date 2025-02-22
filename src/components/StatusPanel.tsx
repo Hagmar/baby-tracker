@@ -1,4 +1,5 @@
 import React from "react";
+import { useData } from "../contexts/DataContext";
 import {
   FeedingSession,
   VitaminDRecord,
@@ -6,19 +7,9 @@ import {
   BellyButtonRecord,
 } from "../types";
 
-interface StatusPanelProps {
-  feedings: FeedingSession[];
-  vitaminD: VitaminDRecord[];
-  baths: BathRecord[];
-  bellyButton: BellyButtonRecord[];
-}
+const StatusPanel: React.FC = () => {
+  const { feedings, vitaminD, baths, bellyButton } = useData();
 
-const StatusPanel: React.FC<StatusPanelProps> = ({
-  feedings,
-  vitaminD,
-  baths,
-  bellyButton,
-}) => {
   // Breastfeeding status
   const getBreastfeedingStatus = (): "future" | "soon" | "past" => {
     if (feedings.length === 0) return "past";
