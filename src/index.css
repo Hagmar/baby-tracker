@@ -364,6 +364,16 @@ body {
   padding: 0.5rem;
   border-radius: var(--border-radius);
   text-align: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.status-indicator:hover {
+  transform: translateY(-1px);
+}
+
+.status-indicator:active {
+  transform: translateY(0);
 }
 
 .status-indicator.future {

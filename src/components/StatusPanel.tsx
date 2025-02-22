@@ -61,18 +61,46 @@ const StatusPanel: React.FC = () => {
     return "success";
   };
 
+  // Add this helper function
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="status-panel">
-      <div className={`status-indicator ${getBreastfeedingStatus()}`}>
+      <div
+        className={`status-indicator ${getBreastfeedingStatus()}`}
+        onClick={() => scrollToSection("feeding-section")}
+        role="button"
+        tabIndex={0}
+      >
         <span className="status-label">Feeding</span>
       </div>
-      <div className={`status-indicator ${getVitaminDStatus()}`}>
+      <div
+        className={`status-indicator ${getVitaminDStatus()}`}
+        onClick={() => scrollToSection("vitamin-d-section")}
+        role="button"
+        tabIndex={0}
+      >
         <span className="status-label">Vitamin D</span>
       </div>
-      <div className={`status-indicator ${getBathStatus()}`}>
+      <div
+        className={`status-indicator ${getBathStatus()}`}
+        onClick={() => scrollToSection("bath-section")}
+        role="button"
+        tabIndex={0}
+      >
         <span className="status-label">Bath</span>
       </div>
-      <div className={`status-indicator ${getBellyButtonStatus()}`}>
+      <div
+        className={`status-indicator ${getBellyButtonStatus()}`}
+        onClick={() => scrollToSection("belly-button-section")}
+        role="button"
+        tabIndex={0}
+      >
         <span className="status-label">Belly Button</span>
       </div>
     </div>

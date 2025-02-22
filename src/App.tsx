@@ -30,22 +30,22 @@ function App() {
         </header>
         <main>
           <StatusPanel />
-          <section className="tracker-section">
+          <section id="feeding-section" className="tracker-section">
             <h2>Breastfeeding</h2>
             <BreastfeedingTracker />
           </section>
 
-          <section className="tracker-section">
+          <section id="vitamin-d-section" className="tracker-section">
             <h2>Vitamin D</h2>
             <VitaminDTracker />
           </section>
 
-          <section className="tracker-section">
+          <section id="bath-section" className="tracker-section">
             <h2>Bath</h2>
             <BathTracker />
           </section>
 
-          <section className="tracker-section">
+          <section id="belly-button-section" className="tracker-section">
             <h2>Belly Button Cleaning</h2>
             <BellyButtonTracker />
           </section>
