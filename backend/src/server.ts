@@ -94,13 +94,26 @@ const requireAuth = (
   next();
 };
 
-// Load data on startup - remove user preservation
+// Add this function before loadData()
+function migrateDatabase(data: Partial<Database>): Database {
+  // Ensure all collections exist with defaults
+  return {
+    medications: data.medications ?? [],
+    feedings: data.feedings ?? [],
+    vitaminD: data.vitaminD ?? [],
+    baths: data.baths ?? [],
+    bellyButton: data.bellyButton ?? [],
+  };
+}
+
+// Update loadData() to use migration
 async function loadData() {
   try {
     const data = await fs.readFile(DATA_FILE, "utf-8");
-    db = JSON.parse(data);
+    db = migrateDatabase(JSON.parse(data));
   } catch (error) {
     console.log("No existing database found, starting fresh");
+    db = migrateDatabase({});
   }
 }
 
