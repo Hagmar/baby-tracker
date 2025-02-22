@@ -19,6 +19,7 @@ const BreastfeedingTracker: React.FC = () => {
   const [deletingSession, setDeletingSession] = useState<FeedingSession | null>(
     null
   );
+  const [showWeekView, setShowWeekView] = useState(false);
 
   const addSession = async (timestamp: Date = new Date()) => {
     const newSession: FeedingSession = {
@@ -49,9 +50,11 @@ const BreastfeedingTracker: React.FC = () => {
     setEditingSession(null);
   };
 
-  const getLast24Hours = () => {
+  const getSessions = () => {
     const now = new Date();
-    const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const cutoff = new Date(
+      now.getTime() - (showWeekView ? 7 * 24 : 24) * 60 * 60 * 1000
+    );
     return feedings
       .filter((s) => s.timestamp >= cutoff)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
@@ -167,9 +170,17 @@ const BreastfeedingTracker: React.FC = () => {
       </div>
 
       <div className="feeding-section">
-        <h3>Last 24 Hours</h3>
+        <div className="feeding-header">
+          <h3>{showWeekView ? "Past Week" : "Last 24 Hours"}</h3>
+          <button
+            className="button small"
+            onClick={() => setShowWeekView(!showWeekView)}
+          >
+            Show {showWeekView ? "24 Hours" : "Week"}
+          </button>
+        </div>
         <div className="feeding-history">
-          {getLast24Hours().map((session) => (
+          {getSessions().map((session) => (
             <div key={session.id} className="feeding-entry">
               <div className="feeding-info">
                 <div className="feeding-time">

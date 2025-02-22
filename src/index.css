@@ -424,3 +424,24 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.feeding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feeding-header h3 {
+  margin: 0;
+}
+
+.feeding-header .button {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.feeding-header .button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
