@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { BellyButtonRecord } from "../types";
 import { storage } from "../utils/storage";
+import { useData } from "../contexts/DataContext";
 
 const BellyButtonTracker: React.FC = () => {
-  const [records, setRecords] = useState<BellyButtonRecord[]>([]);
-
-  useEffect(() => {
-    const unsubscribe = storage.subscribeBellyButton(setRecords);
-    return () => unsubscribe();
-  }, []);
+  const { bellyButton, updateData } = useData();
 
   const toggleCleaning = async (
     date: string,
     period: "morning" | "evening"
   ) => {
-    const existingRecord = records.find((r) => r.date === date);
+    const existingRecord = bellyButton.find((r) => r.date === date);
     const newRecord: BellyButtonRecord = {
       date,
       morning:
@@ -28,30 +24,14 @@ const BellyButtonTracker: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    // Optimistic update
-    setRecords((prev) => {
-      if (existingRecord) {
-        return prev.map((r) => (r.date === date ? newRecord : r));
-      } else {
-        return [...prev, newRecord];
-      }
-    });
-
     try {
       if (existingRecord) {
         await storage.updateBellyButton(newRecord);
       } else {
         await storage.addBellyButton(newRecord);
       }
+      await updateData();
     } catch (error) {
-      // Revert on error
-      setRecords((prev) => {
-        if (existingRecord) {
-          return prev.map((r) => (r.date === date ? existingRecord : r));
-        } else {
-          return prev.filter((r) => r.date !== date);
-        }
-      });
       console.error("Failed to update belly button record:", error);
     }
   };
@@ -62,7 +42,7 @@ const BellyButtonTracker: React.FC = () => {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split("T")[0];
-      const record = records.find((r) => r.date === dateStr);
+      const record = bellyButton.find((r) => r.date === dateStr);
       result.push(
         record || {
           date: dateStr,

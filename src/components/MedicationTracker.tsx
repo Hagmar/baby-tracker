@@ -4,6 +4,7 @@ import { storage } from "../utils/storage";
 import Modal from "./Modal";
 import DateTimePicker from "./DateTimePicker";
 import ConfirmModal from "./ConfirmModal";
+import { useData } from "../contexts/DataContext";
 
 const MEDICATION_RULES: MedicationRule[] = [
   { name: "Alvedon", hoursBetweenDoses: 6 },
@@ -11,7 +12,7 @@ const MEDICATION_RULES: MedicationRule[] = [
 ];
 
 const MedicationTracker: React.FC = () => {
-  const [medications, setMedications] = useState<Medication[]>([]);
+  const { medications, updateData } = useData();
   const [editingMedication, setEditingMedication] = useState<Medication | null>(
     null
   );
@@ -19,35 +20,23 @@ const MedicationTracker: React.FC = () => {
     useState<Medication | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    const unsubscribe = storage.subscribeMedications(setMedications);
-    return () => unsubscribe();
-  }, []);
-
   // Update current time every minute
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  const addMedication = async (
-    medicationName: string,
-    timestamp: Date = new Date()
-  ) => {
+  const addMedication = async (name: string, timestamp: Date = new Date()) => {
     const newMedication: Medication = {
       id: Date.now().toString(),
-      name: medicationName,
+      name,
       timestamp,
     };
 
-    // Optimistic update
-    setMedications((prev) => [...prev, newMedication]);
-
     try {
       await storage.addMedication(newMedication);
+      await updateData();
     } catch (error) {
-      // Revert on error
-      setMedications((prev) => prev.filter((m) => m.id !== newMedication.id));
       console.error("Failed to save medication:", error);
     }
   };
@@ -83,51 +72,28 @@ const MedicationTracker: React.FC = () => {
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   };
 
-  const updateMedicationTime = async (newTimestamp: Date) => {
+  const updateMedicationTime = async (date: Date) => {
     if (!editingMedication) return;
 
-    const updatedMedication = {
+    const updatedMedication: Medication = {
       ...editingMedication,
-      timestamp: newTimestamp,
+      timestamp: date,
     };
-
-    // Optimistic update
-    setMedications((prev) =>
-      prev.map((med) =>
-        med.id === updatedMedication.id ? updatedMedication : med
-      )
-    );
 
     try {
       await storage.updateMedication(updatedMedication);
+      await updateData();
     } catch (error) {
-      // Revert on error
-      setMedications((prev) =>
-        prev.map((med) =>
-          med.id === updatedMedication.id ? editingMedication : med
-        )
-      );
       console.error("Failed to update medication:", error);
     }
     setEditingMedication(null);
   };
 
-  const deleteMedication = async () => {
-    if (!deletingMedication) return;
-
-    // Store for potential revert
-    const medicationToDelete = deletingMedication;
-
-    // Optimistic update
-    setMedications((prev) =>
-      prev.filter((m) => m.id !== medicationToDelete.id)
-    );
-
+  const deleteMedication = async (id: string) => {
     try {
-      await storage.deleteMedication(medicationToDelete.id);
+      await storage.deleteMedication(id);
+      await updateData();
     } catch (error) {
-      // Revert on error
-      setMedications((prev) => [...prev, medicationToDelete]);
       console.error("Failed to delete medication:", error);
     }
     setDeletingMedication(null);
@@ -247,7 +213,9 @@ const MedicationTracker: React.FC = () => {
       <ConfirmModal
         isOpen={!!deletingMedication}
         onClose={() => setDeletingMedication(null)}
-        onConfirm={deleteMedication}
+        onConfirm={() =>
+          deletingMedication && deleteMedication(deletingMedication.id)
+        }
         title="Delete Medication Entry"
         message={`Are you sure you want to delete this ${deletingMedication?.name} entry?`}
       />

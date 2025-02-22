@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BathRecord } from "../types";
 import { storage } from "../utils/storage";
+import { useData } from "../contexts/DataContext";
 
 const BathTracker: React.FC = () => {
-  const [baths, setBaths] = useState<BathRecord[]>([]);
-
-  useEffect(() => {
-    const unsubscribe = storage.subscribeBaths(setBaths);
-    return () => unsubscribe();
-  }, []);
+  const { baths, updateData } = useData();
 
   const addBath = async () => {
     const newBath: BathRecord = {
@@ -17,14 +13,10 @@ const BathTracker: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    // Optimistic update
-    setBaths((prev) => [...prev, newBath]);
-
     try {
       await storage.addBath(newBath);
+      await updateData();
     } catch (error) {
-      // Revert on error
-      setBaths((prev) => prev.filter((b) => b.id !== newBath.id));
       console.error("Failed to save bath record:", error);
     }
   };
