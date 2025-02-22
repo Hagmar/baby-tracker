@@ -92,13 +92,13 @@ const BellyButtonTracker: React.FC = () => {
                 className={`button ${record.morning ? "success" : "danger"}`}
                 onClick={() => toggleCleaning(record.date, "morning")}
               >
-                Morning
+                Morn.
               </button>
               <button
                 className={`button ${record.evening ? "success" : "danger"}`}
                 onClick={() => toggleCleaning(record.date, "evening")}
               >
-                Evening
+                Eve.
               </button>
             </div>
           </div>

@@ -296,7 +296,20 @@ body {
 .cleaning-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+.cleaning-buttons .button {
+  padding: 0.5rem 0.25rem;
+  font-size: 0.875rem;
+  min-width: 60px;
+}
+
+@media (max-width: 350px) {
+  .cleaning-buttons {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .button.success {
