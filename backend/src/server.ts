@@ -1,13 +1,6 @@
 import express from "express";
 import cors from "cors";
-import {
-  Database,
-  Medication,
-  FeedingSession,
-  VitaminDRecord,
-  SyncRequest,
-  SyncResponse,
-} from "./types";
+import { Database } from "./types";
 import fs from "fs/promises";
 import path from "path";
 import session from "express-session";
@@ -113,7 +106,7 @@ async function loadData() {
     db = migrateDatabase(JSON.parse(data));
   } catch (error) {
     console.log("No existing database found, starting fresh");
-    // db = migrateDatabase({});
+    db = migrateDatabase({});
   }
 }
 
