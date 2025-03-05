@@ -105,9 +105,30 @@ const DiaperTracker: React.FC = () => {
   };
 
   const dayStats = getDayStats();
+  const latestDiaper =
+    diapers.length > 0
+      ? diapers.reduce((latest, current) =>
+          latest.timestamp > current.timestamp ? latest : current
+        )
+      : null;
 
   return (
     <div className="diaper-tracker">
+      <div className="latest-diaper">
+        <span>
+          Latest diaper change:{" "}
+          {latestDiaper
+            ? latestDiaper.timestamp.toLocaleDateString(undefined, {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })
+            : "No changes recorded"}
+        </span>
+      </div>
+
       <div className="diaper-form">
         <div className="button-group">
           <button className="button primary" onClick={() => addDiaper("pee")}>

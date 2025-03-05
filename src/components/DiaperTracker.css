@@ -101,4 +101,17 @@
 .diaper-info .type {
   font-weight: 500;
   text-transform: capitalize;
+}
+
+.latest-diaper {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.latest-diaper span {
+  color: var(--text-primary, #333);
 } 

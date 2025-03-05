@@ -5,10 +5,11 @@ import {
   VitaminDRecord,
   BathRecord,
   BellyButtonRecord,
+  DiaperChange,
 } from "../types";
 
 const StatusPanel: React.FC = () => {
-  const { feedings, vitaminD, baths, bellyButton } = useData();
+  const { feedings, vitaminD, baths, bellyButton, diapers } = useData();
 
   // Breastfeeding status
   const getBreastfeedingStatus = (): "future" | "soon" | "past" => {
@@ -61,6 +62,19 @@ const StatusPanel: React.FC = () => {
     return "success";
   };
 
+  // Diaper status
+  const getDiaperStatus = (): "success" | "warning" => {
+    if (diapers.length === 0) return "warning";
+    const latestDiaper = new Date(
+      Math.max(...diapers.map((d) => d.timestamp.getTime()))
+    );
+    const now = new Date();
+    const hoursSinceLastDiaper =
+      (now.getTime() - latestDiaper.getTime()) / (1000 * 60 * 60);
+
+    return hoursSinceLastDiaper > 4 ? "warning" : "success";
+  };
+
   // Add this helper function
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
@@ -78,6 +92,14 @@ const StatusPanel: React.FC = () => {
         tabIndex={0}
       >
         <span className="status-label">Feeding</span>
+      </div>
+      <div
+        className={`status-indicator ${getDiaperStatus()}`}
+        onClick={() => scrollToSection("diaper-section")}
+        role="button"
+        tabIndex={0}
+      >
+        <span className="status-label">Diaper</span>
       </div>
       <div
         className={`status-indicator ${getVitaminDStatus()}`}
