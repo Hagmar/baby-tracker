@@ -144,39 +144,37 @@ const DiaperTracker: React.FC = () => {
       </div>
 
       <div className="diaper-stats">
-        <div className="stats-grid">
-          {dayStats.map((day) => (
-            <div key={day.date} className="day-stats-card">
-              <div className="day-header">
-                <h3>{formatDate(day.date)}</h3>
-                <button
-                  className="button small"
-                  onClick={() => setEditingDay(day.date)}
-                >
-                  Edit
-                </button>
-              </div>
-              <div className="stats-content">
-                <div className="stat-item">
-                  <span className="stat-label">Pee:</span>
-                  <span className="stat-value">{day.pee}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Poo:</span>
-                  <span className="stat-value">{day.poo}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Both:</span>
-                  <span className="stat-value">{day.both}</span>
-                </div>
-                <div className="stat-item total">
-                  <span className="stat-label">Total:</span>
-                  <span className="stat-value">{day.total}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <table className="stats-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Pee</th>
+              <th>Poo</th>
+              <th>Both</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {dayStats.map((day) => (
+              <tr key={day.date}>
+                <td>{formatDate(day.date)}</td>
+                <td>{day.pee}</td>
+                <td>{day.poo}</td>
+                <td>{day.both}</td>
+                <td>{day.total}</td>
+                <td>
+                  <button
+                    className="button small"
+                    onClick={() => setEditingDay(day.date)}
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <Modal
