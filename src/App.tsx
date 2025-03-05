@@ -4,6 +4,7 @@ import VitaminDTracker from "./components/VitaminDTracker";
 import BreastfeedingTracker from "./components/BreastfeedingTracker";
 import BathTracker from "./components/BathTracker";
 import BellyButtonTracker from "./components/BellyButtonTracker";
+import DiaperTracker from "./components/DiaperTracker";
 import LoginPage from "./components/LoginPage";
 import { useAuth } from "./contexts/AuthContext";
 import "./App.css";
@@ -33,6 +34,11 @@ function App() {
           <section id="feeding-section" className="tracker-section">
             <h2>Breastfeeding</h2>
             <BreastfeedingTracker />
+          </section>
+
+          <section id="diaper-section" className="tracker-section">
+            <h2>Diapers</h2>
+            <DiaperTracker />
           </section>
 
           <section id="vitamin-d-section" className="tracker-section">

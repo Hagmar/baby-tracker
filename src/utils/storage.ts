@@ -4,6 +4,7 @@ import {
   VitaminDRecord,
   BathRecord,
   BellyButtonRecord,
+  DiaperChange,
 } from "../types";
 
 type StorageCallback<T> = (data: T[]) => void;
@@ -268,6 +269,51 @@ export const storage = {
     });
 
     if (!response.ok) throw new Error("Failed to update belly button record");
+    return response.json();
+  },
+
+  // Diapers
+  subscribeDiapers: (callback: StorageCallback<DiaperChange>) => {
+    const fetchData = async () => {
+      const response = await fetch(getApiUrl("diapers"), {
+        credentials: "include",
+      });
+      const data = await response.json();
+      callback(
+        data.map((diaper: any) => ({
+          ...diaper,
+          timestamp: new Date(diaper.timestamp),
+        }))
+      );
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  },
+
+  addDiaper: async (diaper: DiaperChange) => {
+    const response = await fetch(getApiUrl("diapers"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...diaper,
+        timestamp: diaper.timestamp.toISOString(),
+      }),
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to save diaper change");
+    return response.json();
+  },
+
+  deleteDiaper: async (id: string) => {
+    const response = await fetch(getApiUrl(`diapers/${id}`), {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete diaper change");
     return response.json();
   },
 };

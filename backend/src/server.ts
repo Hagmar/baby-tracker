@@ -69,6 +69,7 @@ let db: Database = {
   vitaminD: [],
   baths: [],
   bellyButton: [],
+  diapers: [],
 };
 
 // Add these to track deletions
@@ -96,6 +97,7 @@ function migrateDatabase(data: Partial<Database>): Database {
     vitaminD: data.vitaminD ?? [],
     baths: data.baths ?? [],
     bellyButton: data.bellyButton ?? [],
+    diapers: data.diapers ?? [],
   };
 }
 
@@ -302,14 +304,45 @@ app.put("/api/belly-button/:date", requireAuth, (req, res) => {
   res.json(record);
 });
 
-// Add this route before the catch-all route
+// Add these before the catch-all route
+app.get("/api/diapers", requireAuth, (req, res) => {
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const recentDiapers = db.diapers.filter(
+    (d) => new Date(d.timestamp) >= threeDaysAgo
+  );
+  res.json(recentDiapers);
+});
+
+app.post("/api/diapers", requireAuth, (req, res) => {
+  const diaper = req.body;
+  db.diapers.push(diaper);
+  saveData();
+  res.json(diaper);
+});
+
+app.delete("/api/diapers/:id", requireAuth, (req, res) => {
+  const { id } = req.params;
+  db.diapers = db.diapers.filter((d) => d.id !== id);
+  saveData();
+  res.json({ success: true });
+});
+
+// Update the status endpoint to include diapers
 app.get("/api/status", requireAuth, (req, res) => {
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const recentDiapers = db.diapers.filter(
+    (d) => new Date(d.timestamp) >= threeDaysAgo
+  );
+
   res.json({
     medications: db.medications,
     feedings: db.feedings,
     vitaminD: db.vitaminD,
     baths: db.baths,
     bellyButton: db.bellyButton,
+    diapers: recentDiapers,
   });
 });
 

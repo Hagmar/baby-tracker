@@ -33,3 +33,9 @@ export interface BellyButtonRecord {
   evening: boolean;
   updatedAt: string; // ISO date string
 }
+
+export interface DiaperChange {
+  id: string;
+  timestamp: Date;
+  type: "pee" | "poo" | "both";
+}

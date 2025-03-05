@@ -19,12 +19,19 @@ export interface VitaminDRecord {
   updatedAt: string; // ISO date string
 }
 
+export interface DiaperChange {
+  id: string;
+  timestamp: string;
+  type: "pee" | "poo" | "both";
+}
+
 export interface Database {
   medications: Medication[];
   feedings: FeedingSession[];
   vitaminD: VitaminDRecord[];
   baths: BathRecord[];
   bellyButton: BellyButtonRecord[];
+  diapers: DiaperChange[];
 }
 
 declare module "express-session" {
