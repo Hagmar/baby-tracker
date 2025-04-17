@@ -93,14 +93,14 @@ const StatusPanel: React.FC = () => {
       >
         <span className="status-label">Feeding</span>
       </div>
-      <div
+      {/* <div
         className={`status-indicator ${getDiaperStatus()}`}
         onClick={() => scrollToSection("diaper-section")}
         role="button"
         tabIndex={0}
       >
         <span className="status-label">Diaper</span>
-      </div>
+      </div> */}
       <div
         className={`status-indicator ${getVitaminDStatus()}`}
         onClick={() => scrollToSection("vitamin-d-section")}
@@ -117,14 +117,14 @@ const StatusPanel: React.FC = () => {
       >
         <span className="status-label">Bath</span>
       </div>
-      <div
+      {/* <div
         className={`status-indicator ${getBellyButtonStatus()}`}
         onClick={() => scrollToSection("belly-button-section")}
         role="button"
         tabIndex={0}
       >
         <span className="status-label">Belly Button</span>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -36,11 +36,6 @@ function App() {
             <BreastfeedingTracker />
           </section>
 
-          <section id="diaper-section" className="tracker-section">
-            <h2>Diapers</h2>
-            <DiaperTracker />
-          </section>
-
           <section id="vitamin-d-section" className="tracker-section">
             <h2>Vitamin D</h2>
             <VitaminDTracker />
@@ -49,6 +44,11 @@ function App() {
           <section id="bath-section" className="tracker-section">
             <h2>Bath</h2>
             <BathTracker />
+          </section>
+
+          <section id="diaper-section" className="tracker-section">
+            <h2>Diapers</h2>
+            <DiaperTracker />
           </section>
 
           <section id="belly-button-section" className="tracker-section">
