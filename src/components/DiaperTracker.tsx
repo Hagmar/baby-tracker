@@ -50,7 +50,7 @@ const DiaperTracker: React.FC = () => {
     for (let i = 0; i < 3; i++) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split("T")[0];
+      const dateStr = date.toLocaleDateString();
       days.set(dateStr, {
         date: dateStr,
         pee: 0,
@@ -63,7 +63,8 @@ const DiaperTracker: React.FC = () => {
 
     // Count diapers for each day
     diapers.forEach((diaper) => {
-      const dateStr = new Date(diaper.timestamp).toISOString().split("T")[0];
+      const date = new Date(diaper.timestamp);
+      const dateStr = date.toLocaleDateString();
       const stats = days.get(dateStr);
       if (stats) {
         stats[diaper.type]++;
@@ -83,9 +84,9 @@ const DiaperTracker: React.FC = () => {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    if (dateStr === today.toISOString().split("T")[0]) {
+    if (dateStr === today.toLocaleDateString()) {
       return "Today";
-    } else if (dateStr === yesterday.toISOString().split("T")[0]) {
+    } else if (dateStr === yesterday.toLocaleDateString()) {
       return "Yesterday";
     } else {
       return date.toLocaleDateString(undefined, {
