@@ -18,7 +18,7 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 
 // Validate environment variables
 function validateEnv() {
-  const required = ["SESSION_SECRET"];
+  const required = ["SESSION_SECRET", "INVITATION_CODE"];
 
   const missing = required.filter((key) => !process.env[key]);
 
@@ -224,10 +224,16 @@ async function saveData() {
 
 // User management routes
 app.post("/api/register", async (req, res) => {
-  const { username, password, babyName, dateOfBirth } = req.body;
+  const { username, password, babyName, dateOfBirth, invitationCode } =
+    req.body;
 
-  if (!username || !password || !babyName || !dateOfBirth) {
+  if (!username || !password || !babyName || !dateOfBirth || !invitationCode) {
     return res.status(400).json({ error: "All fields are required" });
+  }
+
+  // Validate invitation code
+  if (invitationCode !== process.env.INVITATION_CODE) {
+    return res.status(401).json({ error: "Invalid invitation code" });
   }
 
   // Check if username already exists

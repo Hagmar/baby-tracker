@@ -18,7 +18,8 @@ export const AuthContext = createContext<{
     username: string,
     password: string,
     babyName: string,
-    dateOfBirth: string
+    dateOfBirth: string,
+    invitationCode: string
   ) => Promise<void>;
   logout: () => Promise<void>;
 }>({
@@ -84,12 +85,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     username: string,
     password: string,
     babyName: string,
-    dateOfBirth: string
+    dateOfBirth: string,
+    invitationCode: string
   ) => {
     const response = await fetch(getApiUrl("register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, babyName, dateOfBirth }),
+      body: JSON.stringify({
+        username,
+        password,
+        babyName,
+        dateOfBirth,
+        invitationCode,
+      }),
       credentials: "include",
     });
 

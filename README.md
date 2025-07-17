@@ -45,6 +45,7 @@ cd backend && npm install && cd ..
 ```bash
 cd backend
 echo "SESSION_SECRET=your-secret-key-here" > .env
+echo "INVITATION_CODE=your-invitation-code-here" >> .env
 cd ..
 ```
 
@@ -83,8 +84,11 @@ The application will be available at `http://localhost:3001`
    - Password
    - Baby's name
    - Baby's date of birth
+   - Invitation code (provided by the administrator)
 3. Click "Register"
 4. After successful registration, you'll be redirected to login
+
+**Note**: Registration requires a valid invitation code. Only users with the correct invitation code can create accounts.
 
 ### Using the Application
 
@@ -162,6 +166,23 @@ All data is stored in `backend/data/db.json` with the following structure:
 - Sessions are managed with express-session
 - All data is filtered by baby ID to ensure users only see their own data
 - CSRF protection through session-based authentication
+- **Invitation Code System**: Registration is restricted to users with valid invitation codes
+
+### Managing Invitation Codes
+
+To control who can register for your baby tracker:
+
+1. Set the `INVITATION_CODE` environment variable in your `.env` file
+2. Share this code only with friends you want to invite
+3. To change the code, update the environment variable and restart the server
+4. Old invitation codes will no longer work after being changed
+
+**Security Tips**:
+
+- Use a strong, unique invitation code
+- Share the code securely (not in public repositories)
+- Consider changing the code periodically
+- Keep the code separate from your main password
 
 ## Development
 

@@ -7,6 +7,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [babyName, setBabyName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [invitationCode, setInvitationCode] = useState("");
   const [error, setError] = useState("");
   const { login, register } = useAuth();
 
@@ -16,7 +17,13 @@ const LoginPage: React.FC = () => {
 
     try {
       if (isRegistering) {
-        await register(username, password, babyName, dateOfBirth);
+        await register(
+          username,
+          password,
+          babyName,
+          dateOfBirth,
+          invitationCode
+        );
         // After successful registration, switch to login mode
         setIsRegistering(false);
         setError("");
@@ -37,6 +44,7 @@ const LoginPage: React.FC = () => {
     setPassword("");
     setBabyName("");
     setDateOfBirth("");
+    setInvitationCode("");
   };
 
   return (
@@ -87,6 +95,17 @@ const LoginPage: React.FC = () => {
                 id="dateOfBirth"
                 value={dateOfBirth}
                 onChange={(e) => setDateOfBirth(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="invitationCode">Invitation Code</label>
+              <input
+                type="text"
+                id="invitationCode"
+                value={invitationCode}
+                onChange={(e) => setInvitationCode(e.target.value)}
                 required
               />
             </div>
