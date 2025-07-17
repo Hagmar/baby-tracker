@@ -1,0 +1,128 @@
+.sleep-tracker {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+.sleep-section {
+  margin-top: 1rem;
+}
+
+.sleep-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sleep-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+
+.sleep-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sleep-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-primary, #333);
+}
+
+.duration {
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  font-size: 1.1rem;
+}
+
+.sleep-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bed-time,
+.wake-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: fit-content;
+}
+
+.bed-time span,
+.wake-time span {
+  font-size: 1.2rem;
+}
+
+.sleep-comment {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: var(--stat-bg, #f5f5f5);
+  border-radius: 4px;
+  color: var(--text-secondary, #666);
+  font-style: italic;
+}
+
+.sleep-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* Combine all buttons into one row */
+.sleep-card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.sleep-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.time-pickers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.time-picker label {
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+}
+
+.comment-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comment-input label {
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+}
+
+.comment-input input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  font-size: 1rem;
+} 

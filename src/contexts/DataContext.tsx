@@ -7,6 +7,7 @@ import {
   BathRecord,
   BellyButtonRecord,
   DiaperChange,
+  SleepRecord,
 } from "../types";
 
 interface DataContextType {
@@ -16,6 +17,7 @@ interface DataContextType {
   baths: BathRecord[];
   bellyButton: BellyButtonRecord[];
   diapers: DiaperChange[];
+  sleep: SleepRecord[];
   updateData: () => Promise<void>;
 }
 
@@ -31,6 +33,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     baths: [],
     bellyButton: [],
     diapers: [],
+    sleep: [],
     updateData: async () => {},
   });
 
@@ -38,7 +41,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const newData = await storage.getStatus();
 
-      // Convert dates for feedings, medications and diapers
+      // Convert dates for feedings, medications, diapers and sleep
       const processedData = {
         ...newData,
         feedings: newData.feedings.map((f: any) => ({
@@ -52,6 +55,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         diapers: newData.diapers.map((d: any) => ({
           ...d,
           timestamp: new Date(d.timestamp),
+        })),
+        sleep: newData.sleep.map((s: any) => ({
+          ...s,
+          bedTime: s.bedTime ? new Date(s.bedTime) : null,
+          wakeTime: s.wakeTime ? new Date(s.wakeTime) : null,
         })),
       };
 

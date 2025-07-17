@@ -25,6 +25,15 @@ export interface DiaperChange {
   type: "pee" | "poo" | "both";
 }
 
+export interface SleepRecord {
+  id: string;
+  date: string;  // YYYY-MM-DD for the night the sleep started
+  bedTime: string | null;  // When they went to bed (ISO string)
+  wakeTime: string | null;  // When they woke up (ISO string)
+  comment?: string;  // Optional comment about the night
+  updatedAt: string;  // ISO date string
+}
+
 export interface Database {
   medications: Medication[];
   feedings: FeedingSession[];
@@ -32,6 +41,7 @@ export interface Database {
   baths: BathRecord[];
   bellyButton: BellyButtonRecord[];
   diapers: DiaperChange[];
+  sleep: SleepRecord[];
 }
 
 declare module "express-session" {

@@ -39,3 +39,11 @@ export interface DiaperChange {
   timestamp: Date;
   type: "pee" | "poo" | "both";
 }
+
+export interface SleepRecord {
+  id: string;
+  date: string;  // YYYY-MM-DD for the night the sleep started
+  bedTime: Date | null;  // When they went to bed
+  wakeTime: Date | null;  // When they woke up
+  comment?: string;  // Optional comment about the night
+}

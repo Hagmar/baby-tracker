@@ -70,6 +70,7 @@ let db: Database = {
   baths: [],
   bellyButton: [],
   diapers: [],
+  sleep: [],
 };
 
 // Add these to track deletions
@@ -98,6 +99,7 @@ function migrateDatabase(data: Partial<Database>): Database {
     baths: data.baths ?? [],
     bellyButton: data.bellyButton ?? [],
     diapers: data.diapers ?? [],
+    sleep: data.sleep ?? [],
   };
 }
 
@@ -328,12 +330,72 @@ app.delete("/api/diapers/:id", requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
-// Update the status endpoint to include diapers
+// Sleep tracking routes
+app.get("/api/sleep", requireAuth, (req, res) => {
+  // Return sleep records for the last 7 days
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentSleep = db.sleep.filter(
+    (s) => new Date(s.date) >= sevenDaysAgo
+  );
+  res.json(recentSleep);
+});
+
+app.post("/api/sleep", requireAuth, (req, res) => {
+  const sleep = {
+    ...req.body,
+    updatedAt: new Date().toISOString(),
+  };
+  
+  // If a record for this date exists, update it
+  const index = db.sleep.findIndex((s) => s.date === sleep.date);
+  if (index >= 0) {
+    db.sleep[index] = sleep;
+  } else {
+    db.sleep.push(sleep);
+  }
+  
+  saveData();
+  res.json(sleep);
+});
+
+app.put("/api/sleep/:date", requireAuth, (req, res) => {
+  const { date } = req.params;
+  const sleep = {
+    ...req.body,
+    updatedAt: new Date().toISOString(),
+  };
+
+  const index = db.sleep.findIndex((s) => s.date === date);
+  if (index === -1) {
+    res.status(404).json({ error: "Sleep record not found" });
+    return;
+  }
+
+  db.sleep[index] = sleep;
+  saveData();
+  res.json(sleep);
+});
+
+app.delete("/api/sleep/:date", requireAuth, (req, res) => {
+  const { date } = req.params;
+  db.sleep = db.sleep.filter((s) => s.date !== date);
+  saveData();
+  res.json({ success: true });
+});
+
+// Update the status endpoint to include sleep data
 app.get("/api/status", requireAuth, (req, res) => {
   const threeDaysAgo = new Date();
   threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
   const recentDiapers = db.diapers.filter(
     (d) => new Date(d.timestamp) >= threeDaysAgo
+  );
+
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentSleep = db.sleep.filter(
+    (s) => new Date(s.date) >= sevenDaysAgo
   );
 
   res.json({
@@ -343,6 +405,7 @@ app.get("/api/status", requireAuth, (req, res) => {
     baths: db.baths,
     bellyButton: db.bellyButton,
     diapers: recentDiapers,
+    sleep: recentSleep,
   });
 });
 

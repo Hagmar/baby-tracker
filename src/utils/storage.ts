@@ -5,6 +5,7 @@ import {
   BathRecord,
   BellyButtonRecord,
   DiaperChange,
+  SleepRecord,
 } from "../types";
 
 type StorageCallback<T> = (data: T[]) => void;
@@ -314,6 +315,32 @@ export const storage = {
     });
 
     if (!response.ok) throw new Error("Failed to delete diaper change");
+    return response.json();
+  },
+
+  addOrUpdateSleep: async (sleep: SleepRecord) => {
+    const response = await fetch(getApiUrl("sleep"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...sleep,
+        bedTime: sleep.bedTime?.toISOString() || null,
+        wakeTime: sleep.wakeTime?.toISOString() || null,
+      }),
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to save sleep record");
+    return response.json();
+  },
+
+  deleteSleep: async (date: string) => {
+    const response = await fetch(getApiUrl(`sleep/${date}`), {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete sleep record");
     return response.json();
   },
 };

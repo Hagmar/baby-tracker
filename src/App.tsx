@@ -5,6 +5,7 @@ import BreastfeedingTracker from "./components/BreastfeedingTracker";
 import BathTracker from "./components/BathTracker";
 import BellyButtonTracker from "./components/BellyButtonTracker";
 import DiaperTracker from "./components/DiaperTracker";
+import SleepTracker from "./components/SleepTracker";
 import LoginPage from "./components/LoginPage";
 import { useAuth } from "./contexts/AuthContext";
 import "./App.css";
@@ -44,6 +45,11 @@ function App() {
           <section id="bath-section" className="tracker-section">
             <h2>Bath</h2>
             <BathTracker />
+          </section>
+
+          <section id="sleep-section" className="tracker-section">
+            <h2>Sleep</h2>
+            <SleepTracker />
           </section>
 
           <section id="diaper-section" className="tracker-section">
