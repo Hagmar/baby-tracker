@@ -307,6 +307,46 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.header-info h1 {
+  margin: 0;
+}
+
+.baby-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.baby-name {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.baby-dob {
+  font-style: italic;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  font-size: 0.9em;
+  color: #666;
 }
 
 .login-page {
@@ -352,4 +392,22 @@
   color: #dc3545;
   margin-bottom: 1rem;
   text-align: center;
+}
+
+.form-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.link-button:hover {
+  color: #0056b3;
 } 

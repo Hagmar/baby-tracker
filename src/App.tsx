@@ -13,7 +13,7 @@ import StatusPanel from "./components/StatusPanel";
 import { DataProvider } from "./contexts/DataContext";
 
 function App() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, baby, user } = useAuth();
 
   if (!isAuthenticated) {
     return <LoginPage />;
@@ -24,10 +24,19 @@ function App() {
       <div className="app">
         <header>
           <div className="header-content">
-            <h1>Baby Tracker</h1>
-            <button className="button secondary" onClick={logout}>
-              Logout
-            </button>
+            <div className="header-info">
+              <h1>Baby Tracker</h1>
+              {baby && (
+                <div className="baby-info">
+                  <span className="baby-name">{baby.name}</span>
+                </div>
+              )}
+            </div>
+            <div className="header-actions">
+              <button className="button secondary" onClick={logout}>
+                Logout
+              </button>
+            </div>
           </div>
         </header>
         <main>
